@@ -28,3 +28,13 @@ IMAGE_DIR = ROOT_DIR / "images"
 OUTPUT_DIR.mkdir(exist_ok=True)
 
 IMAGE_DIR.mkdir(exist_ok=True)
+
+# ========================= //PHASE 2 Started 
+# CSS SELECTORS
+# =========================
+
+ARTICLE_CARD = "article"
+
+ARTICLE_TITLE = "h2 a"
+
+ARTICLE_CATEGORY = "header a.c_k"
