@@ -36,13 +36,20 @@ def main():
             """
 
             #for index, article in enumerate(articles, start=1):
-            cards = scraper.get_article_cards()
+            """cards = scraper.get_article_cards()
 
             for index in range(min(5, len(cards))):
 
                 scraper.open_article(index)
 
-                details = scraper.extract_article_details()
+                details = scraper.extract_article_details()"""
+            articles = scraper.get_first_five_articles()
+
+            for index, article in enumerate(articles, start=1):
+
+                scraper.open_article(article["url"])
+
+                details = scraper.extract_article_details() 
 
                 print()
                 print(f"Article {index + 1}")
@@ -63,7 +70,7 @@ def main():
                 else:
                     print("Content could not be fetched.")
 
-                scraper.go_back_to_opinion()
+                #scraper.go_back_to_opinion()
 
             break
 

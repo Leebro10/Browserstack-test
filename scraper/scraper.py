@@ -1,4 +1,4 @@
-from bs4 import BeautifulSoup #Very important to fetch article content
+from bs4 import BeautifulSoup  # Very important to fetch article content
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
@@ -47,25 +47,28 @@ class ElPaisScraper:
 
         self.wait = WebDriverWait(self.driver, WAIT_TIME)
 
-    def check_verification_page(self): #In future you might change this 
+    def check_verification_page(self):  # In future you might change this
         """
         Save the current page for debugging and raise an exception.
         """
         cards = self.driver.find_elements(By.CSS_SELECTOR, ARTICLE_CARD)
 
-        body = self.driver.find_elements(By.CSS_SELECTOR,ARTICLE_BODY,)
+        body = self.driver.find_elements(
+            By.CSS_SELECTOR,
+            ARTICLE_BODY,
+        )
 
         if cards or body:
             return
-        
+
         print(self.driver.title)
         print(self.driver.current_url)
 
-        #with open("verification.html", "w", encoding="utf-8") as f:
-        #        f.write(self.driver.page_source)
+        # with open("verification.html", "w", encoding="utf-8") as f:
+        #     f.write(self.driver.page_source)
 
         raise VerificationPageException(
-                "Expected page elements were not found."
+            "Expected page elements were not found."
         )
 
     def open_opinion_page(self):
@@ -93,14 +96,17 @@ class ElPaisScraper:
             )
 
             cookie_button.click()
+
             """
-            Added because your code assumed "No banner"means "No overlay."Not true. The overlay still existed.
+            Added because your code assumed "No banner" means "No overlay."
+            Not true. The overlay still existed.
             """
+
             self.wait.until(
                 EC.invisibility_of_element_located(
                     (
                         By.ID,
-                        "acceptationCMPWall"
+                        "acceptationCMPWall",
                     )
                 )
             )
@@ -114,16 +120,18 @@ class ElPaisScraper:
     def get_article_cards(self):
 
         try:
+
             self.wait.until(
-            EC.presence_of_all_elements_located(
-                (By.CSS_SELECTOR, ARTICLE_CARD)
+                EC.presence_of_all_elements_located(
+                    (By.CSS_SELECTOR, ARTICLE_CARD)
+                )
             )
-        )
 
         except TimeoutException:
 
             self.check_verification_page()
             raise
+
         cards = self.driver.find_elements(
             By.CSS_SELECTOR,
             ARTICLE_CARD,
@@ -134,9 +142,33 @@ class ElPaisScraper:
 
         return cards
 
-    def open_article(self, index):
+    def open_article(self, url):
 
-        cards = self.get_article_cards()
+        self.driver.get(url)
+
+        self.wait.until(
+            EC.presence_of_element_located(
+                (By.CSS_SELECTOR, ARTICLE_BODY)
+            )
+        )     
+
+    """def open_article(self, url):
+
+        self.wait.until(
+            lambda driver: len(
+                driver.find_elements(By.CSS_SELECTOR, ARTICLE_CARD)
+            ) > index
+        )
+
+        cards = self.driver.find_elements(
+            By.CSS_SELECTOR,
+            ARTICLE_CARD,
+        )
+
+        self.driver.execute_script(
+            "arguments[0].scrollIntoView({block: 'center'});",
+            cards[index],
+        )
 
         cards[index].click()
 
@@ -157,9 +189,9 @@ class ElPaisScraper:
             with open("article_timeout.html", "w", encoding="utf-8") as f:
                 f.write(self.driver.page_source)
 
-            raise  
+            raise"""
 
-    """def get_first_five_articles(self):
+    def get_first_five_articles(self):
 
         logger.info("Collecting article cards...")
 
@@ -230,7 +262,7 @@ class ElPaisScraper:
 
         logger.info(f"{len(articles)} articles collected.")
 
-        return articles"""
+        return articles
 
     def extract_article_details(self):
         """
@@ -244,15 +276,15 @@ class ElPaisScraper:
         print("Current URL :", self.driver.current_url)
         print("Page title  :", self.driver.title)
 
-        #with open("article_debug.html", "w", encoding="utf-8") as f:
-        #    f.write(self.driver.page_source)
+        # with open("article_debug.html", "w", encoding="utf-8") as f:
+        #     f.write(self.driver.page_source)
 
-        #self.wait.until(
-        #    EC.presence_of_element_located(
-        #        (By.CSS_SELECTOR, ARTICLE_BODY)
-        #    )
-        #)
-    
+        # self.wait.until(
+        #     EC.presence_of_element_located(
+        #         (By.CSS_SELECTOR, ARTICLE_BODY)
+        #     )
+        # )
+
         soup = BeautifulSoup(
             self.driver.page_source,
             "html.parser",
@@ -285,23 +317,11 @@ class ElPaisScraper:
             image_url = image.get("src")
 
         logger.info("Article extracted successfully.")
+
         """
         This works.
         But it is not what I ultimately recommend.
-        I'll explain later. self.driver.back() and self.wait.until(
-                    EC.presence_of_all_elements_located(
-                        (By.CSS_SELECTOR, ARTICLE_CARD)
-                    )
-                ) 
-        """     
-
-        return {
-            "title": title,
-            "content": content,
-            "image_url": image_url,
-        }
-
-    def go_back_to_opinion(self):
+        I'll explain later.
 
         self.driver.back()
 
@@ -310,7 +330,24 @@ class ElPaisScraper:
                 (By.CSS_SELECTOR, ARTICLE_CARD)
             )
         )
-    
+        """
+
+        return {
+            "title": title,
+            "content": content,
+            "image_url": image_url,
+        }
+
+    """def go_back_to_opinion(self):
+
+        self.driver.back()
+
+        self.wait.until(
+            EC.presence_of_all_elements_located(
+                (By.CSS_SELECTOR, ARTICLE_CARD)
+            )
+        )"""
+
     def close(self):
 
         logger.info("Closing browser.")
