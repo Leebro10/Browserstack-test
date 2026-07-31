@@ -1,3 +1,5 @@
+from collections import Counter
+import re
 from scraper.scraper import ElPaisScraper
 from exceptions.scraper_exceptions import VerificationPageException
 from scraper.translator import translate_text
@@ -25,6 +27,8 @@ def main():
 
             articles = scraper.get_first_five_articles()
 
+            translated_titles = []
+
             count = 1
 
             for article in articles:
@@ -32,12 +36,18 @@ def main():
                 scraper.driver.get(article["url"])
 
                 try:
+
                     details = scraper.extract_article_details()
-                    english_title = translate_text(details["title"])
-                    print(f"Spanish Title : {details['title']}")
-                    print(f"English Title : {english_title}")
+
                     if details is None:
                         continue
+
+                    english_title = translate_text(details["title"])
+
+                    translated_titles.append(english_title)
+
+                    print(f"Spanish Title : {details['title']}")
+                    print(f"English Title : {english_title}")
 
                 except Exception:
 
@@ -54,6 +64,7 @@ def main():
                     print(f"Image URL: {details['image_url']}")
                 else:
                     print("Image URL: Not available")
+
                 if details["image_url"]:
                     scraper.download_image(
                         details["image_url"],
@@ -72,6 +83,37 @@ def main():
 
                 if count > 5:
                     break
+
+            print()
+            print("=" * 90)
+            print("REPEATED WORDS (MORE THAN TWICE)")
+            print("=" * 90)
+
+            all_words = []
+
+            for title in translated_titles:
+
+                words = re.findall(
+                    r"[a-zA-Z']+",
+                    title.lower()
+                )
+
+                all_words.extend(words)
+
+            word_counts = Counter(all_words)
+
+            found = False
+
+            for word, frequency in word_counts.items():
+
+                if frequency > 2:
+
+                    print(f"{word} : {frequency}")
+                    found = True
+
+            if not found:
+
+                print("No words appeared more than twice.")
 
             break
 
