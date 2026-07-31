@@ -16,21 +16,54 @@ def main():
 
             scraper.accept_cookies()
 
-            articles = scraper.get_first_five_articles()
-
             print("\n")
             print("=" * 90)
             print("FIRST FIVE OPINION ARTICLES")
             print("=" * 90)
-
-            for index, article in enumerate(articles, start=1):
+            
+            """
+            Later we'll add translation and image downloading inside this loop
+            """
+            """
+            for article in articles:
+                details = scraper.extract_article_details(article["url"])
 
                 print()
-                print(f"Article {index}")
                 print("-" * 90)
-                print(f"Category : {article['category']}")
-                print(f"Title    : {article['title']}")
-                print(f"URL      : {article['url']}")
+                print(article["title"])
+
+                print()
+            """
+
+            #for index, article in enumerate(articles, start=1):
+            cards = scraper.get_article_cards()
+
+            for index in range(min(5, len(cards))):
+
+                scraper.open_article(index)
+
+                details = scraper.extract_article_details()
+
+                print()
+                print(f"Article {index + 1}")
+                print("-" * 90)
+
+                print(f"Title : {details['title']}")
+
+                if details["image_url"]:
+                    print(f"Image URL: {details['image_url']}")
+                else:
+                    print("Image URL: Not available")
+
+                print()
+                print("Content:")
+
+                if details["content"]:
+                    print(details["content"])
+                else:
+                    print("Content could not be fetched.")
+
+                scraper.go_back_to_opinion()
 
             break
 

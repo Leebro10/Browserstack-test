@@ -1,4 +1,6 @@
-from bs4 import BeautifulSoup #Very important to fetch article content
+"""
+PHASE 3 THIS WAS NO CHANGES WERE MADE PHASE 2 AND PHASE 3 SAME
+"""
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
@@ -16,7 +18,6 @@ from config import (
     ARTICLE_CARD,
     ARTICLE_TITLE,
     ARTICLE_CATEGORY,
-    ARTICLE_HEADING,
     ARTICLE_BODY,
     ARTICLE_PARAGRAPHS,
     ARTICLE_IMAGE,
@@ -51,18 +52,11 @@ class ElPaisScraper:
         """
         Save the current page for debugging and raise an exception.
         """
-        cards = self.driver.find_elements(By.CSS_SELECTOR, ARTICLE_CARD)
+        print("\nPage title:", self.driver.title)
+        print("Current URL:", self.driver.current_url)
 
-        body = self.driver.find_elements(By.CSS_SELECTOR,ARTICLE_BODY,)
-
-        if cards or body:
-            return
-        
-        print(self.driver.title)
-        print(self.driver.current_url)
-
-        #with open("verification.html", "w", encoding="utf-8") as f:
-        #        f.write(self.driver.page_source)
+        with open("verification.html", "w", encoding="utf-8") as f:
+                f.write(self.driver.page_source)
 
         raise VerificationPageException(
                 "Expected page elements were not found."
@@ -93,17 +87,6 @@ class ElPaisScraper:
             )
 
             cookie_button.click()
-            """
-            Added because your code assumed "No banner"means "No overlay."Not true. The overlay still existed.
-            """
-            self.wait.until(
-                EC.invisibility_of_element_located(
-                    (
-                        By.ID,
-                        "acceptationCMPWall"
-                    )
-                )
-            )
 
             logger.info("Cookie banner accepted.")
 
@@ -111,55 +94,7 @@ class ElPaisScraper:
 
             logger.info("Cookie banner not present.")
 
-    def get_article_cards(self):
-
-        try:
-            self.wait.until(
-            EC.presence_of_all_elements_located(
-                (By.CSS_SELECTOR, ARTICLE_CARD)
-            )
-        )
-
-        except TimeoutException:
-
-            self.check_verification_page()
-            raise
-        cards = self.driver.find_elements(
-            By.CSS_SELECTOR,
-            ARTICLE_CARD,
-        )
-
-        if not cards:
-            self.check_verification_page()
-
-        return cards
-
-    def open_article(self, index):
-
-        cards = self.get_article_cards()
-
-        cards[index].click()
-
-        try:
-
-            self.wait.until(
-                EC.presence_of_element_located(
-                    (By.CSS_SELECTOR, ARTICLE_BODY)
-                )
-            )
-
-        except TimeoutException:
-
-            print(self.driver.current_url)
-
-            print(self.driver.title)
-
-            with open("article_timeout.html", "w", encoding="utf-8") as f:
-                f.write(self.driver.page_source)
-
-            raise  
-
-    """def get_first_five_articles(self):
+    def get_first_five_articles(self):
 
         logger.info("Collecting article cards...")
 
@@ -230,87 +165,71 @@ class ElPaisScraper:
 
         logger.info(f"{len(articles)} articles collected.")
 
-        return articles"""
+        return articles
 
-    def extract_article_details(self):
+    def extract_article_details(self, url):
         """
-        Open the article using Selenium and parse the rendered HTML
-        with BeautifulSoup.
+        Opens an article and extracts its title, content and image URL.
         """
 
-        logger.info(f"Extracting article: {self.driver.current_url}")
+        logger.info(f"Opening article: {url}")
 
-        print("=" * 80)
-        print("Current URL :", self.driver.current_url)
-        print("Page title  :", self.driver.title)
+        self.driver.get(url)
 
-        #with open("article_debug.html", "w", encoding="utf-8") as f:
-        #    f.write(self.driver.page_source)
+        #self.check_verification_page()
 
-        #self.wait.until(
-        #    EC.presence_of_element_located(
-        #        (By.CSS_SELECTOR, ARTICLE_BODY)
-        #    )
-        #)
-    
-        soup = BeautifulSoup(
-            self.driver.page_source,
-            "html.parser",
+        try:
+
+            self.wait.until(
+                EC.presence_of_element_located(
+                    (By.CSS_SELECTOR, ARTICLE_BODY)
+                )
+            )
+
+        except TimeoutException:
+
+            logger.warning("Article body not found.")
+
+            self.check_verification_page()
+
+            raise
+
+        paragraphs = self.driver.find_elements(
+            By.CSS_SELECTOR,
+            f"{ARTICLE_BODY} {ARTICLE_PARAGRAPHS}"
         )
-
-        title = ""
-
-        title_element = soup.select_one(ARTICLE_HEADING)
-
-        if title_element:
-            title = title_element.get_text(" ", strip=True)
-
-        body = soup.select_one(ARTICLE_BODY)
-
-        if body is None:
-            raise Exception("Article body not found.")
-
-        paragraphs = body.select(ARTICLE_PARAGRAPHS)
 
         content = "\n".join(
-            p.get_text(" ", strip=True)
-            for p in paragraphs
+            paragraph.text.strip()
+            for paragraph in paragraphs
+            if paragraph.text.strip()
         )
+
+        if not content:
+
+            logger.warning("Article has no content.")
 
         image_url = None
 
-        image = soup.select_one(ARTICLE_IMAGE)
+        try:
 
-        if image:
-            image_url = image.get("src")
+            image = self.driver.find_element(
+                By.CSS_SELECTOR,
+                ARTICLE_IMAGE,
+            )
+
+            image_url = image.get_attribute("src")
+
+        except Exception:
+
+            logger.info("No cover image found.")
 
         logger.info("Article extracted successfully.")
-        """
-        This works.
-        But it is not what I ultimately recommend.
-        I'll explain later. self.driver.back() and self.wait.until(
-                    EC.presence_of_all_elements_located(
-                        (By.CSS_SELECTOR, ARTICLE_CARD)
-                    )
-                ) 
-        """     
-
         return {
-            "title": title,
             "content": content,
             "image_url": image_url,
         }
 
-    def go_back_to_opinion(self):
-
-        self.driver.back()
-
-        self.wait.until(
-            EC.presence_of_all_elements_located(
-                (By.CSS_SELECTOR, ARTICLE_CARD)
-            )
-        )
-    
     def close(self):
 
         logger.info("Closing browser.")
