@@ -193,6 +193,41 @@ class ElPaisScraper:
 
     def get_first_five_articles(self):
 
+        cards = self.get_article_cards()
+
+        articles = []
+
+        for card in cards:
+
+            try:
+
+                title = card.find_element(
+                    By.CSS_SELECTOR,
+                    ARTICLE_TITLE
+                ).text
+
+                url = card.find_element(
+                    By.CSS_SELECTOR,
+                    ARTICLE_TITLE
+                ).get_attribute("href")
+
+                articles.append(
+                    {
+                        "title": title,
+                        "url": url,
+                    }
+                )
+
+                if len(articles) == 5:
+                    break
+
+            except Exception:
+                continue
+
+        return articles
+
+    """def get_first_five_articles(self):
+
         logger.info("Collecting article cards...")
 
         try:
@@ -262,7 +297,7 @@ class ElPaisScraper:
 
         logger.info(f"{len(articles)} articles collected.")
 
-        return articles
+        return articles"""
 
     def extract_article_details(self):
         """
@@ -275,15 +310,6 @@ class ElPaisScraper:
         print("=" * 80)
         print("Current URL :", self.driver.current_url)
         print("Page title  :", self.driver.title)
-
-        # with open("article_debug.html", "w", encoding="utf-8") as f:
-        #     f.write(self.driver.page_source)
-
-        # self.wait.until(
-        #     EC.presence_of_element_located(
-        #         (By.CSS_SELECTOR, ARTICLE_BODY)
-        #     )
-        # )
 
         soup = BeautifulSoup(
             self.driver.page_source,
@@ -317,20 +343,6 @@ class ElPaisScraper:
             image_url = image.get("src")
 
         logger.info("Article extracted successfully.")
-
-        """
-        This works.
-        But it is not what I ultimately recommend.
-        I'll explain later.
-
-        self.driver.back()
-
-        self.wait.until(
-            EC.presence_of_all_elements_located(
-                (By.CSS_SELECTOR, ARTICLE_CARD)
-            )
-        )
-        """
 
         return {
             "title": title,

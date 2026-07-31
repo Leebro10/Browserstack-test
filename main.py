@@ -35,15 +35,34 @@ def main():
                 print()
             """
 
-            #for index, article in enumerate(articles, start=1):
-            """cards = scraper.get_article_cards()
-
-            for index in range(min(5, len(cards))):
-
-                scraper.open_article(index)
-
-                details = scraper.extract_article_details()"""
             articles = scraper.get_first_five_articles()
+
+            for index, article in enumerate(articles, start=1):
+
+                scraper.driver.get(article["url"])
+
+                details = scraper.extract_article_details()
+
+                print()
+                print(f"Article {index}")
+                print("-" * 90)
+
+                print(f"Title : {details['title']}")
+
+                if details["image_url"]:
+                    print(f"Image URL: {details['image_url']}")
+                else:
+                    print("Image URL: Not available")
+
+                print()
+                print("Content:")
+
+                if details["content"]:
+                    print(details["content"])
+                else:
+                    print("Content could not be fetched.")
+
+            """articles = scraper.get_first_five_articles()
 
             for index, article in enumerate(articles, start=1):
 
@@ -89,7 +108,7 @@ def main():
             else:
 
                 print("\nMaximum retry attempts reached.")
-
+"""
         finally:
 
             scraper.close()
