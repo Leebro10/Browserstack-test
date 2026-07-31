@@ -22,20 +22,6 @@ def main():
             print("FIRST FIVE OPINION ARTICLES")
             print("=" * 90)
 
-            """
-            Later we'll add translation and image downloading inside this loop
-            """
-            """
-            for article in articles:
-                details = scraper.extract_article_details(article["url"])
-
-                print()
-                print("-" * 90)
-                print(article["title"])
-
-                print()
-            """
-
             articles = scraper.get_first_five_articles()
 
             count = 1
@@ -46,10 +32,12 @@ def main():
 
                 try:
                     details = scraper.extract_article_details()
+                    if details is None:
+                        continue
 
                 except Exception:
 
-                    print(f"Skipping non-standard article: {article['url']}")
+                    print(f"Skipping article: {article['url']}")
                     continue
 
                 print()
@@ -75,37 +63,6 @@ def main():
 
                 if count > 5:
                     break
-
-            """
-            articles = scraper.get_first_five_articles()
-
-            for index, article in enumerate(articles, start=1):
-
-                scraper.open_article(article["url"])
-
-                details = scraper.extract_article_details()
-
-                print()
-                print(f"Article {index + 1}")
-                print("-" * 90)
-
-                print(f"Title : {details['title']}")
-
-                if details["image_url"]:
-                    print(f"Image URL: {details['image_url']}")
-                else:
-                    print("Image URL: Not available")
-
-                print()
-                print("Content:")
-
-                if details["content"]:
-                    print(details["content"])
-                else:
-                    print("Content could not be fetched.")
-
-                #scraper.go_back_to_opinion()
-            """
 
             break
 

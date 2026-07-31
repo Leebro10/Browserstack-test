@@ -152,45 +152,6 @@ class ElPaisScraper:
             )
         )     
 
-    """def open_article(self, url):
-
-        self.wait.until(
-            lambda driver: len(
-                driver.find_elements(By.CSS_SELECTOR, ARTICLE_CARD)
-            ) > index
-        )
-
-        cards = self.driver.find_elements(
-            By.CSS_SELECTOR,
-            ARTICLE_CARD,
-        )
-
-        self.driver.execute_script(
-            "arguments[0].scrollIntoView({block: 'center'});",
-            cards[index],
-        )
-
-        cards[index].click()
-
-        try:
-
-            self.wait.until(
-                EC.presence_of_element_located(
-                    (By.CSS_SELECTOR, ARTICLE_BODY)
-                )
-            )
-
-        except TimeoutException:
-
-            print(self.driver.current_url)
-
-            print(self.driver.title)
-
-            with open("article_timeout.html", "w", encoding="utf-8") as f:
-                f.write(self.driver.page_source)
-
-            raise"""
-
     def get_first_five_articles(self):
 
         cards = self.get_article_cards()
@@ -201,15 +162,23 @@ class ElPaisScraper:
 
             try:
 
-                title = card.find_element(
+                title_element = card.find_element(
                     By.CSS_SELECTOR,
-                    ARTICLE_TITLE
-                ).text
+                    ARTICLE_TITLE,
+                )
 
-                url = card.find_element(
-                    By.CSS_SELECTOR,
-                    ARTICLE_TITLE
-                ).get_attribute("href")
+                title = title_element.text.strip()
+
+                if not title:
+                    continue
+
+                url = title_element.get_attribute("href")
+
+                if (
+                    not url
+                    or "/opinion/" not in url
+                ):
+                    continue
 
                 articles.append(
                     {
@@ -225,79 +194,6 @@ class ElPaisScraper:
                 continue
 
         return articles
-
-    """def get_first_five_articles(self):
-
-        logger.info("Collecting article cards...")
-
-        try:
-
-            self.wait.until(
-                EC.presence_of_all_elements_located(
-                    (By.CSS_SELECTOR, ARTICLE_CARD)
-                )
-            )
-
-        except TimeoutException:
-
-            logger.warning("Timed out waiting for article cards.")
-
-            self.check_verification_page()
-
-            raise
-
-        cards = self.driver.find_elements(
-            By.CSS_SELECTOR,
-            ARTICLE_CARD,
-        )
-
-        if not cards:
-            self.check_verification_page()
-
-        articles = []
-
-        for card in cards:
-
-            try:
-
-                title_element = card.find_element(
-                    By.CSS_SELECTOR,
-                    ARTICLE_TITLE,
-                )
-
-                category_element = card.find_element(
-                    By.CSS_SELECTOR,
-                    ARTICLE_CATEGORY,
-                )
-
-                title = title_element.text.strip()
-
-                url = title_element.get_attribute("href")
-
-                category = category_element.text.strip()
-
-                if not title:
-
-                    continue
-
-                articles.append(
-                    {
-                        "title": title,
-                        "url": url,
-                        "category": category,
-                    }
-                )
-
-                if len(articles) == 5:
-
-                    break
-
-            except Exception:
-                continue
-
-        logger.info(f"{len(articles)} articles collected.")
-
-        return articles"""
 
     def extract_article_details(self):
         """
@@ -326,7 +222,12 @@ class ElPaisScraper:
         body = soup.select_one(ARTICLE_BODY)
 
         if body is None:
-            raise Exception("Article body not found.")
+
+            logger.warning(
+                f"Skipping unsupported page: {self.driver.current_url}"
+            )
+
+            return None
 
         paragraphs = body.select(ARTICLE_PARAGRAPHS)
 
@@ -349,16 +250,6 @@ class ElPaisScraper:
             "content": content,
             "image_url": image_url,
         }
-
-    """def go_back_to_opinion(self):
-
-        self.driver.back()
-
-        self.wait.until(
-            EC.presence_of_all_elements_located(
-                (By.CSS_SELECTOR, ARTICLE_CARD)
-            )
-        )"""
 
     def close(self):
 
