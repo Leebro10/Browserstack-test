@@ -2,6 +2,7 @@ from scraper.scraper import ElPaisScraper
 from exceptions.scraper_exceptions import VerificationPageException
 import time
 
+
 def main():
 
     MAX_RETRIES = 3
@@ -20,7 +21,7 @@ def main():
             print("=" * 90)
             print("FIRST FIVE OPINION ARTICLES")
             print("=" * 90)
-            
+
             """
             Later we'll add translation and image downloading inside this loop
             """
@@ -37,14 +38,22 @@ def main():
 
             articles = scraper.get_first_five_articles()
 
-            for index, article in enumerate(articles, start=1):
+            count = 1
+
+            for article in articles:
 
                 scraper.driver.get(article["url"])
 
-                details = scraper.extract_article_details()
+                try:
+                    details = scraper.extract_article_details()
+
+                except Exception:
+
+                    print(f"Skipping non-standard article: {article['url']}")
+                    continue
 
                 print()
-                print(f"Article {index}")
+                print(f"Article {count}")
                 print("-" * 90)
 
                 print(f"Title : {details['title']}")
@@ -62,13 +71,19 @@ def main():
                 else:
                     print("Content could not be fetched.")
 
-            """articles = scraper.get_first_five_articles()
+                count += 1
+
+                if count > 5:
+                    break
+
+            """
+            articles = scraper.get_first_five_articles()
 
             for index, article in enumerate(articles, start=1):
 
                 scraper.open_article(article["url"])
 
-                details = scraper.extract_article_details() 
+                details = scraper.extract_article_details()
 
                 print()
                 print(f"Article {index + 1}")
@@ -90,6 +105,7 @@ def main():
                     print("Content could not be fetched.")
 
                 #scraper.go_back_to_opinion()
+            """
 
             break
 
@@ -108,10 +124,11 @@ def main():
             else:
 
                 print("\nMaximum retry attempts reached.")
-"""
+
         finally:
 
             scraper.close()
+
 
 if __name__ == "__main__":
     main()

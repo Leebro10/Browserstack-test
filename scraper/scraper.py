@@ -218,7 +218,7 @@ class ElPaisScraper:
                     }
                 )
 
-                if len(articles) == 5:
+                if len(articles) == 10:
                     break
 
             except Exception:
