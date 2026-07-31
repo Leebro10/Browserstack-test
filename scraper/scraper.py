@@ -1,3 +1,5 @@
+import os #For images
+import requests #For images
 from bs4 import BeautifulSoup  # Very important to fetch article content
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -250,6 +252,41 @@ class ElPaisScraper:
             "content": content,
             "image_url": image_url,
         }
+
+    def download_image(self, image_url, article_number):
+        """
+        Download an article image and save it in the images folder.
+        """
+
+        if not image_url:
+
+            logger.warning("No image URL found.")
+
+            return
+
+        os.makedirs("images", exist_ok=True)
+
+        extension = image_url.split("?")[0].split(".")[-1]
+
+        filename = f"article_{article_number}.{extension}"
+
+        filepath = os.path.join("images", filename)
+
+        try:
+
+            response = requests.get(image_url, timeout=20)
+
+            response.raise_for_status()
+
+            with open(filepath, "wb") as file:
+
+                file.write(response.content)
+
+            logger.info(f"Image saved: {filepath}")
+
+        except requests.RequestException as e:
+
+            logger.warning(f"Failed to download image: {e}")
 
     def close(self):
 

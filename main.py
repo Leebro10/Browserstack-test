@@ -50,6 +50,11 @@ def main():
                     print(f"Image URL: {details['image_url']}")
                 else:
                     print("Image URL: Not available")
+                if details["image_url"]:
+                    scraper.download_image(
+                        details["image_url"],
+                        count
+                    )
 
                 print()
                 print("Content:")
