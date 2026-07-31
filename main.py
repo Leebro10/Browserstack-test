@@ -1,5 +1,6 @@
 from scraper.scraper import ElPaisScraper
 from exceptions.scraper_exceptions import VerificationPageException
+from scraper.translator import translate_text
 import time
 
 
@@ -32,6 +33,9 @@ def main():
 
                 try:
                     details = scraper.extract_article_details()
+                    english_title = translate_text(details["title"])
+                    print(f"Spanish Title : {details['title']}")
+                    print(f"English Title : {english_title}")
                     if details is None:
                         continue
 
