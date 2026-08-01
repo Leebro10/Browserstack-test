@@ -27,7 +27,7 @@ def main():
 
             print("\n")
             print("=" * 90)
-            print("FIRST FIVE OPINION ARTICLES")
+            print("ARTICLES SCRAPING IN PROCESS....")
             print("=" * 90)
 
             articles = scraper.get_first_five_articles()
@@ -70,8 +70,8 @@ def main():
                     continue
 
                 print()
-                print(f"Article {count}")
-                print("-" * 90)
+                print(Fore.CYAN + f"ARTICLE {count}")
+                print(Fore.CYAN + "-" * 90)
 
                 print(f"Title : {details['title']}")
 
@@ -140,7 +140,7 @@ def main():
 
                 if frequency > 2:
 
-                    print(Fore.RED + f"{word} : {frequency}")
+                    print(Fore.GREEN + f"{word} : {frequency}")
                     found = True
 
             if not found:

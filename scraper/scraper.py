@@ -1,5 +1,5 @@
-import os #For images
-import requests #For images
+import os # For images
+import requests # For images
 from bs4 import BeautifulSoup  # Very important to fetch article content
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -49,7 +49,7 @@ class ElPaisScraper:
 
         self.wait = WebDriverWait(self.driver, WAIT_TIME)
 
-    def check_verification_page(self):  # In future you might change this
+    def check_verification_page(self):  # In future I might change this
         """
         Save the current page for debugging and raise an exception.
         """
