@@ -6,6 +6,9 @@ from scraper.scraper import ElPaisScraper
 from exceptions.scraper_exceptions import VerificationPageException
 from scraper.translator import translate_text
 import time
+from colorama import Fore, Style, init
+
+init(autoreset=True)
 
 
 def main():
@@ -104,13 +107,19 @@ def main():
                     indent=4
                 )
 
-            print("\nArticles saved successfully!")
-            print(f"JSON File: {OUTPUT_FILE}")
+            print()
+            print(Fore.GREEN + "=" * 90)
+            print(Fore.GREEN + "ARTICLES SAVED SUCCESSFULLY")
+            print(Fore.GREEN + "=" * 90)
+
+            print(Fore.CYAN + f"Location : {OUTPUT_FILE}")
+            print(Fore.YELLOW + f"Total Articles : {len(scraped_articles)}")
+            print()
 
             print()
-            print("=" * 90)
-            print("REPEATED WORDS (MORE THAN TWICE)")
-            print("=" * 90)
+            print(Fore.MAGENTA + "=" * 90)
+            print(Fore.MAGENTA + "REPEATED WORDS ARE")
+            print(Fore.MAGENTA + "=" * 90)
 
             all_words = []
 
@@ -131,12 +140,12 @@ def main():
 
                 if frequency > 2:
 
-                    print(f"{word} : {frequency}")
+                    print(Fore.RED + f"{word} : {frequency}")
                     found = True
 
             if not found:
 
-                print("No words appeared more than twice.")
+                print(Fore.YELLOW + "No words appeared more than twice.")
 
             break
 
