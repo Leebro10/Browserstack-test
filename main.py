@@ -1,3 +1,5 @@
+import json
+from config import OUTPUT_FILE
 from collections import Counter
 import re
 from scraper.scraper import ElPaisScraper
@@ -8,7 +10,7 @@ import time
 
 def main():
 
-    MAX_RETRIES = 3
+    from config import MAX_RETRIES
 
     for attempt in range(1, MAX_RETRIES + 1):
 
@@ -28,6 +30,7 @@ def main():
             articles = scraper.get_first_five_articles()
 
             translated_titles = []
+            scraped_articles = []
 
             count = 1
 
@@ -43,8 +46,17 @@ def main():
                         continue
 
                     english_title = translate_text(details["title"])
-
                     translated_titles.append(english_title)
+
+                    scraped_articles.append(
+                    {
+                        "title": details["title"],
+                        "translated_title": english_title,
+                        "url": article["url"],
+                        "image_url": details["image_url"],
+                        "content": details["content"]
+                    }
+                )
 
                     print(f"Spanish Title : {details['title']}")
                     print(f"English Title : {english_title}")
@@ -83,6 +95,17 @@ def main():
 
                 if count > 5:
                     break
+            # Save all scraped articles to JSON
+            with open(OUTPUT_FILE, "w", encoding="utf-8") as file:
+                json.dump(
+                    scraped_articles,
+                    file,
+                    ensure_ascii=False,
+                    indent=4
+                )
+
+            print("\nArticles saved successfully!")
+            print(f"JSON File: {OUTPUT_FILE}")
 
             print()
             print("=" * 90)
@@ -122,8 +145,9 @@ def main():
             print(f"\nVerification page detected (Attempt {attempt}/{MAX_RETRIES})")
 
             if attempt < MAX_RETRIES:
+                from config import RETRY_WAIT_SECONDS
 
-                wait_time = 10 * attempt
+                wait_time = RETRY_WAIT_SECONDS * attempt
 
                 print(f"Waiting {wait_time} seconds before retrying...")
 
