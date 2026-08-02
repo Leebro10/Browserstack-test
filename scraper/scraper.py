@@ -1,3 +1,4 @@
+import re
 import os # For images
 import requests # For images
 from bs4 import BeautifulSoup  # Very important to fetch article content
@@ -36,11 +37,11 @@ class ElPaisScraper:
         if HEADLESS:
             options.add_argument("--headless=new")
 
-        options.add_argument("--start-maximized")
+            options.add_argument("--start-maximized")
 
-        options.add_argument("--disable-notifications")
+            options.add_argument("--disable-notifications")
 
-        options.add_argument("--disable-popup-blocking")
+            options.add_argument("--disable-popup-blocking")
 
         self.driver = webdriver.Chrome(
             service=Service(ChromeDriverManager().install()),
@@ -65,9 +66,6 @@ class ElPaisScraper:
 
         print(self.driver.title)
         print(self.driver.current_url)
-
-        # with open("verification.html", "w", encoding="utf-8") as f:
-        #     f.write(self.driver.page_source)
 
         raise VerificationPageException(
             "Expected page elements were not found."
@@ -237,8 +235,6 @@ class ElPaisScraper:
             p.get_text(" ", strip=True)
             for p in paragraphs
         )
-
-        image_url = None
 
         image = soup.select_one(ARTICLE_IMAGE)
 

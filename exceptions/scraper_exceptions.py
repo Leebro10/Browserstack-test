@@ -1,4 +1,4 @@
-# Exceptions were created to secure bot detection, bypass not required
+# Exceptions are created to mainly secure bot detection
 class VerificationPageException(Exception):
     """Raised when El País shows a verification page."""
     pass
