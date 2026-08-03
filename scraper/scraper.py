@@ -30,7 +30,7 @@ from utils.logger import logger
 
 class ElPaisScraper:
 
-    def __init__(self):
+    def __init__(self, driver=None):
 
         options = webdriver.ChromeOptions()
 
@@ -43,10 +43,22 @@ class ElPaisScraper:
 
             options.add_argument("--disable-popup-blocking")
 
-        self.driver = webdriver.Chrome(
-            service=Service(ChromeDriverManager().install()),
-            options=options,
-        )
+        if driver is not None:
+
+            self.driver = driver
+
+        else:
+
+             options = webdriver.ChromeOptions()
+
+        if HEADLESS:
+            options.add_argument("--headless=new")
+
+
+            self.driver = webdriver.Chrome(
+                service=Service(ChromeDriverManager().install()),
+                options=options,
+    )
 
         self.wait = WebDriverWait(self.driver, WAIT_TIME)
 
