@@ -1,4 +1,4 @@
-# El País Opinion Scraper
+# El País Scraper
 
 ## Overview
 
@@ -66,7 +66,7 @@ ElPaisScraper/
 Clone the repository
 
 ```bash
-git clone <repository_url>
+git clone <https://github.com/Leebro10/Browserstack-test.git>
 ```
 
 Move into the project
